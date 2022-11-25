@@ -19,7 +19,7 @@ go get -u -v github.com/hunterhug/goweixin
 
 你只需使用该 `SDK` 实现登录并获取用户信息即可：
 
-```
+```go
 func TestMiniProgramClient_LoginGetUserInfo(t *testing.T) {
 	appId := "wxd4e08529844845e7"
 	appSecret := "e6782244f7a7e994d20721f004e3e9ae"
