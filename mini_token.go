@@ -7,26 +7,22 @@ import (
 	"github.com/hunterhug/marmot/miner"
 )
 
-type Token struct {
+type MiniProgramAccessToken struct {
 	AccessToken string `json:"access_token"`
 }
 
 // AuthGetAccessToken https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/access-token/auth.getAccessToken.html
-func AuthGetAccessToken(appId, appSecret string) (token string, err error) {
-	if appId == "" || appSecret == "" {
-		return "", errors.New("empty")
-	}
-
-	url := fmt.Sprintf("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s", appId, appSecret)
+func (c *MiniProgramClient) AuthGetAccessToken() (token string, err error) {
+	url := fmt.Sprintf("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s", c.AppId, c.AppSecret)
 	api := miner.NewAPI()
 	raw, err := api.Clone().SetUrl(url).Get()
 	if err != nil {
 		return "", err
 	}
 
-	miner.Logger.Infof("wx AuthGetAccessToken token: %v", string(raw))
+	miner.Logger.Infof("MiniProgramClient AuthGetAccessToken token: %v", string(raw))
 
-	t := new(Token)
+	t := new(MiniProgramAccessToken)
 	err = json.Unmarshal(raw, t)
 	if err != nil {
 		return "", err

@@ -1,4 +1,4 @@
-package goweixin
+package fake
 
 import (
 	"fmt"

@@ -1,8 +1,9 @@
-package goweixin
+package fake
 
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/hunterhug/goweixin"
 	"github.com/hunterhug/marmot/miner"
 )
 
@@ -32,7 +33,7 @@ func Login(appId, appSecret, code string) (info *UserInfo, err error) {
 		return nil, err
 	}
 
-	wErr := new(ErrorRsp)
+	wErr := new(goweixin.ErrorRsp)
 	err = json.Unmarshal(data, wErr)
 	if err != nil {
 		return
