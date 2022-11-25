@@ -64,7 +64,7 @@ func TestMiniProgramClient_LoginGetBaseInfo(t *testing.T) {
 }
 ```
 
-客户端使用开放能力：[头像昵称填写](https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/userProfile.html) ，然后将头像和昵称直接发给服务端，服务端进行用户绑定。
+客户端使用开放能力：[头像昵称填写](https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/userProfile.html) ，然后将头像和昵称直接发给服务端，服务端自行进行用户绑定。
 
 ### B. 小程序发送 [消息订阅](https://developers.weixin.qq.com/miniprogram/dev/api/open-api/subscribe-message/wx.requestSubscribeMessage.html)
 
