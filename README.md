@@ -136,3 +136,9 @@ func TestMiniProgramClient_GetPhoneNumber(t *testing.T) {
 	fmt.Printf("%#v", phone)
 }
 ```
+
+### [地理位置获取](https://developers.weixin.qq.com/miniprogram/dev/api/location/wx.getLocation.html)
+
+仅客户端操作。详见：[地理位置接口新增与相关流程调整](https://developers.weixin.qq.com/community/develop/doc/000a02f2c5026891650e7f40351c01) 。
+
+其他：[获取用户收货地址](https://developers.weixin.qq.com/miniprogram/dev/api/open-api/address/wx.chooseAddress.html) 。
