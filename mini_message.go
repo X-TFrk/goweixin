@@ -7,18 +7,18 @@ import (
 	"github.com/hunterhug/marmot/miner"
 )
 
-var (
-	// MiniProgramStateDeveloper 开发版
-	MiniProgramStateDeveloper = "developer"
-	// MiniProgramStateTrial 体验版
-	MiniProgramStateTrial = "trial"
-	// MiniProgramStateFormal 正式版
-	MiniProgramStateFormal = "formal"
-)
+//var (
+// MiniProgramStateDeveloper 开发版
+// MiniProgramStateDeveloper = "developer"
+// MiniProgramStateTrial 体验版
+// MiniProgramStateTrial = "trial"
+// MiniProgramStateFormal 正式版
+// MiniProgramStateFormal = "formal"
+//)
 
 type MiniProgramMessage struct {
 	// 接收者（用户）的 openid
-	ToUser string `json:"to_user"`
+	ToUser string `json:"touser"`
 	// 所需下发的订阅模板id
 	TemplateId string `json:"template_id"`
 	// 点击模板卡片后的跳转页面，仅限本小程序内的页面。支持带参数,（示例index?foo=bar）。该字段不填则模板无跳转。
@@ -39,13 +39,9 @@ func (e *ErrorRsp) Error() string {
 }
 
 // SendMessage https://developers.weixin.qq.com/miniprogram/dev/api/open-api/subscribe-message/wx.requestSubscribeMessage.html
-func (c *MiniProgramClient) SendMessage(token string, openId string, templateId, page string, data map[string]string, state string) error {
-	if token == "" || openId == "" || templateId == "" || state == "" {
+func (c *MiniProgramClient) SendMessage(token string, openId string, templateId, page string, data map[string]string) error {
+	if token == "" || openId == "" || templateId == "" {
 		return errors.New("empty")
-	}
-
-	if state != MiniProgramStateDeveloper && state != MiniProgramStateFormal && state != MiniProgramStateTrial {
-		return errors.New("state wrong")
 	}
 
 	// https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/subscribe-message/subscribeMessage.send.html
@@ -62,7 +58,7 @@ func (c *MiniProgramClient) SendMessage(token string, openId string, templateId,
 	}
 
 	m.Data = mm
-	m.MiniProgramState = state
+	//m.MiniProgramState = state
 
 	raw, err := json.Marshal(m)
 	if err != nil {

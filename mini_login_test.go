@@ -2,6 +2,7 @@ package goweixin
 
 import (
 	"fmt"
+	"syscall"
 	"testing"
 )
 
@@ -9,9 +10,14 @@ func TestMiniProgramClient_LoginGetSessionKey(t *testing.T) {
 	appId := "wxd4e08529844845e7"
 	appSecret := "e6782244f7a7e994d20721f004e3e9ae"
 
+	appId, _ = syscall.Getenv("appId")
+	appSecret, _ = syscall.Getenv("appSecret")
+
+	fmt.Println(appId, appSecret)
+
 	c := NewMiniProgramClient(appId, appSecret)
 
-	code := "063ScS0003rfZO1sYd000AkUhf1ScS0b"
+	code := "053fFFFa11knjE0wuJFa1d7Dsd2fFFFc"
 	result, err := c.LoginGetSessionKey(code)
 	if err != nil {
 		fmt.Println(err.Error())

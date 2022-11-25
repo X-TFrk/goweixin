@@ -64,13 +64,12 @@ func TestMiniProgramClient_SendMessage(t *testing.T) {
 
 	fmt.Println("token is:", token)
 
-	openId := "omvdI6yayVSRLK9NL2OcCHEWQ0mA"
-	templateId := "templateId"
-	page := ""
-	data := map[string]string{"thing1": "2222", "thing7": "sss", "thing3": "dddd"}
-	state := MiniProgramStateDeveloper
+	openId := "on9VO5YXH_gMLxRKMql98IUjtzkI"
+	templateId := "IgOxNz7ydQn9UsssswIwiggdd5TroAbRLXcosY"
+	page := "index?foo=bar"
+	data := map[string]string{"thing1": "这是一个内容", "thing7": "这个也是内容", "thing3": "这个也是内容啊"}
 
-	err = c.SendMessage(token, openId, templateId, page, data, state)
+	err = c.SendMessage(token, openId, templateId, page, data)
 	if err != nil {
 		fmt.Println("send err:", err.Error())
 		return
