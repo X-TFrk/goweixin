@@ -6,13 +6,13 @@
 go get -u -v github.com/hunterhug/goweixin
 ```
 
-## 小程序开发
+## 一. 小程序开发
 
-### 小程序微信登录
+小程序基础库版本：[2.26.1](https://developers.weixin.qq.com/miniprogram/dev/framework/release)
 
-[小程序登录](https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/login.html) 区别于网页登录。
+### A. [小程序登录](https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/login.html)
 
-需要客户端和服务端联调，获取密钥对请登陆 [微信公众平台](https://mp.weixin.qq.com)。
+小程序登录区别于网页登录，需要客户端和服务端联调，获取密钥对请登陆 [微信公众平台](https://mp.weixin.qq.com)。
 
 逻辑如下：
 
@@ -42,12 +42,12 @@ func TestMiniProgramClient_LoginGetUserInfo(t *testing.T) {
 }
 ```
 
-### 小程序发送 [消息订阅](https://developers.weixin.qq.com/miniprogram/dev/api/open-api/subscribe-message/wx.requestSubscribeMessage.html)。
+### B. 小程序发送 [消息订阅](https://developers.weixin.qq.com/miniprogram/dev/api/open-api/subscribe-message/wx.requestSubscribeMessage.html)
 
 完全在服务端执行，不需要客户端参与。
 
-1. 先获取全局 [access_token](https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/access-token/auth.getAccessToken.html) ：
-2. 然后发送[订阅消息](https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/subscribe-message/subscribeMessage.send.html) ：
+1. 先获取全局 [access_token](https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/access-token/auth.getAccessToken.html) 。
+2. 然后发送[订阅消息](https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/subscribe-message/subscribeMessage.send.html) 。
 
 ```go
 func TestMiniProgramClient_SendMessage(t *testing.T) {
@@ -74,5 +74,41 @@ func TestMiniProgramClient_SendMessage(t *testing.T) {
 		fmt.Println("send err:", err.Error())
 		return
 	}
+}
+```
+
+### C. [获取手机号](https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/getPhoneNumber.html)
+
+需要客户端和服务端联调。
+
+逻辑如下：
+
+1. 客户端调用 [`<button open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber"></button>`](https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/getPhoneNumber.html) 获取到 `code` 传给服务端。
+2. 服务端先获取全局 [access_token](https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/access-token/auth.getAccessToken.html) 。
+3. 服务端再配合 `code` 调用 [phonenumber.getPhoneNumber](https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/phonenumber/phonenumber.getPhoneNumber.html) 获取手机号。
+
+```go
+func TestMiniProgramClient_GetPhoneNumber(t *testing.T) {
+	appId := "wxd4e08529844845e7"
+	appSecret := "e6782244f7a7e994d20721f004e3e9ae"
+
+	c := NewMiniProgramClient(appId, appSecret)
+
+	token, err := c.AuthGetAccessToken()
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+
+	fmt.Println("token is:", token)
+
+	code := "910031e46a34e633401c2ebb23f281646ea9775ad8c1276b793e59846f0ddb22"
+	phone, err := c.GetPhoneNumber(token, code)
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+
+	fmt.Printf("%#v", phone)
 }
 ```

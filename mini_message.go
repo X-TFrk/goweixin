@@ -71,20 +71,21 @@ func (c *MiniProgramClient) SendMessage(token string, openId string, templateId,
 		return err
 	}
 
-	miner.Logger.Infof("MiniProgramClient SendMessage result: %v", string(body))
+	miner.Logger.Infof("MiniProgramClient SendMessage raw: %s", string(body))
 
 	if worker.ResponseStatusCode != 200 {
-		return errors.New(fmt.Sprintf("wx send message http status:%d", worker.ResponseStatusCode))
+		return errors.New(fmt.Sprintf("MiniProgramClient SendMessage http status:%d", worker.ResponseStatusCode))
 	}
 
-	e := ErrorRsp{}
-	err = json.Unmarshal(body, &e)
+	wErr := new(ErrorRsp)
+	err = json.Unmarshal(body, wErr)
 	if err != nil {
 		return err
 	}
 
-	if e.ErrCode != 0 {
-		return errors.New(e.ErrMsg)
+	if wErr.ErrCode != 0 {
+		return wErr
 	}
+
 	return nil
 }

@@ -60,6 +60,8 @@ func (c *MiniProgramClient) LoginGetSessionKey(code string) (info *MiniProgramSe
 		return nil, err
 	}
 
+	miner.Logger.Infof("MiniProgramClient LoginGetSessionKey raw: %s", string(data))
+
 	wErr := new(ErrorRsp)
 	err = json.Unmarshal(data, wErr)
 	if err != nil {
@@ -76,8 +78,6 @@ func (c *MiniProgramClient) LoginGetSessionKey(code string) (info *MiniProgramSe
 		return
 	}
 
-	miner.Logger.Infof("MiniProgramClient LoginGetSessionKey token: %#v", wToken)
-
 	return wToken, nil
 
 }
@@ -91,6 +91,8 @@ func (c *MiniProgramClient) LoginGetUserInfo(code, encryptedData, iv string) (in
 	if err != nil {
 		return nil, err
 	}
+
+	miner.Logger.Infof("MiniProgramClient LoginGetUserInfo raw: %s", string(data))
 
 	wErr := new(ErrorRsp)
 	err = json.Unmarshal(data, wErr)
@@ -157,7 +159,7 @@ func (c *MiniProgramClient) DecryptUserInfo(sessionKey, encryptData, iv string) 
 	}
 
 	// {\"nickName\":\"阿大\",\"gender\":0,\"language\":\"zh_CN\",\"city\":\"\",\"province\":\"\",\"country\":\"\",\"avatarUrl\":\"https://thirdwx.qlogo.cn/mmopen/vi_32/8JDU7pm9u0qUiaQr1ackQMA55RaE7Q3avOZ1YhG5kKsziaKM8YTDibtrH7rVicsRJu3YLlV0L3qG6YANa4dtF55zqA/132\",\"watermark\":{\"timestamp\":1669357949,\"appid\":\"wxd4e08529844845e7\"}}\x03\x03\x03
-	miner.Logger.Infof("MiniProgramClient DecryptUserInfo: %#v", string(raw))
+	miner.Logger.Infof("MiniProgramClient DecryptUserInfo raw %s", string(raw))
 
 	temp := strings.Split(string(raw), "}")
 	tempL := len(temp)
