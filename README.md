@@ -8,8 +8,6 @@ go get -u -v github.com/hunterhug/goweixin
 
 ## 一. 小程序开发
 
-小程序基础库版本：[2.26.1](https://developers.weixin.qq.com/miniprogram/dev/framework/release)
-
 ### A. [小程序登录](https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/login.html)
 
 小程序登录区别于网页登录，需要客户端和服务端联调，获取密钥对请登陆 [微信公众平台](https://mp.weixin.qq.com)。
@@ -41,6 +39,32 @@ func TestMiniProgramClient_LoginGetUserInfo(t *testing.T) {
 	fmt.Printf("%#v", userInfo)
 }
 ```
+
+特殊说明，`2.27.0` 以后的[小程序版本](https://developers.weixin.qq.com/miniprogram/dev/framework/release) 无法使用该接口。详情见：[小程序用户头像昵称获取规则调整公告](https://developers.weixin.qq.com/community/develop/doc/00022c683e8a80b29bed2142b56c01) 。
+
+最新方案：
+
+服务端请直接获取用户的基本信息 `OpenId`，`UnionId`，改用：
+
+```go
+func TestMiniProgramClient_LoginGetBaseInfo(t *testing.T) {
+	appId := "wxd4e08529844845e7"
+	appSecret := "e6782244f7a7e994d20721f004e3e9ae"
+
+	c := NewMiniProgramClient(appId, appSecret)
+
+	code := "033SD2100a5hZO15kd100qqPJf2SD21f"
+	result, err := c.LoginGetBaseInfo(code)
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+
+	fmt.Printf("%s,%s", result.OpenId, result.UnionId)
+}
+```
+
+客户端使用开放能力：[头像昵称填写](https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/userProfile.html) ，然后将头像和昵称直接发给服务端，服务端进行用户绑定。
 
 ### B. 小程序发送 [消息订阅](https://developers.weixin.qq.com/miniprogram/dev/api/open-api/subscribe-message/wx.requestSubscribeMessage.html)
 

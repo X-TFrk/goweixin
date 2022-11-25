@@ -2,11 +2,14 @@ package goweixin
 
 import (
 	"fmt"
+	"github.com/hunterhug/marmot/miner"
 	"syscall"
 	"testing"
 )
 
-func TestMiniProgramClient_LoginGetSessionKey(t *testing.T) {
+func TestMiniProgramClient_LoginGetBaseInfo(t *testing.T) {
+	miner.SetLogLevel(miner.INFO)
+
 	appId := "wxd4e08529844845e7"
 	appSecret := "e6782244f7a7e994d20721f004e3e9ae"
 
@@ -17,14 +20,14 @@ func TestMiniProgramClient_LoginGetSessionKey(t *testing.T) {
 
 	c := NewMiniProgramClient(appId, appSecret)
 
-	code := "053fFFFa11knjE0wuJFa1d7Dsd2fFFFc"
-	result, err := c.LoginGetSessionKey(code)
+	code := "033SD2100a5hZO15kd100qqPJf2SD21f"
+	result, err := c.LoginGetBaseInfo(code)
 	if err != nil {
 		fmt.Println(err.Error())
 		return
 	}
 
-	fmt.Printf("%#v", result)
+	fmt.Printf("%s,%s", result.OpenId, result.UnionId)
 }
 
 func TestMiniProgramClient_LoginGetUserInfo(t *testing.T) {

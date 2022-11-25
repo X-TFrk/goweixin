@@ -27,7 +27,7 @@ func NewMiniProgramClient(appId, appSecret string) *MiniProgramClient {
 	return m
 }
 
-type MiniProgramSessionKey struct {
+type MiniProgramBaseInfo struct {
 	SessionKey string `json:"session_key"`
 	OpenId     string `json:"openid"`
 	UnionId    string `json:"unionid"`
@@ -50,7 +50,7 @@ type MiniProgramUserInfo struct {
 	SessionKey string `json:"session_key"`
 }
 
-func (c *MiniProgramClient) LoginGetSessionKey(code string) (info *MiniProgramSessionKey, err error) {
+func (c *MiniProgramClient) LoginGetBaseInfo(code string) (info *MiniProgramBaseInfo, err error) {
 	url := fmt.Sprintf("https://api.weixin.qq.com/sns/jscode2session?appid=%s&secret=%s&js_code=%s&grant_type=authorization_code",
 		c.AppId, c.AppSecret, code)
 
@@ -72,7 +72,7 @@ func (c *MiniProgramClient) LoginGetSessionKey(code string) (info *MiniProgramSe
 		return nil, wErr
 	}
 
-	wToken := new(MiniProgramSessionKey)
+	wToken := new(MiniProgramBaseInfo)
 	err = json.Unmarshal(data, wToken)
 	if err != nil {
 		return
@@ -104,7 +104,7 @@ func (c *MiniProgramClient) LoginGetUserInfo(code, encryptedData, iv string) (in
 		return nil, wErr
 	}
 
-	wToken := new(MiniProgramSessionKey)
+	wToken := new(MiniProgramBaseInfo)
 	err = json.Unmarshal(data, wToken)
 	if err != nil {
 		return
