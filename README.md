@@ -68,10 +68,13 @@ func TestMiniProgramClient_LoginGetBaseInfo(t *testing.T) {
 
 ### B. 小程序发送 [消息订阅](https://developers.weixin.qq.com/miniprogram/dev/api/open-api/subscribe-message/wx.requestSubscribeMessage.html)
 
-完全在服务端执行，不需要客户端参与。
+发送完全在服务端执行，不需要客户端参与。但是客户端需要调用 `wx.requestSubscribeMessage` 订阅弹窗，引导用户订阅，
 
-1. 先获取全局 [access_token](https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/access-token/auth.getAccessToken.html) 。
-2. 然后发送[订阅消息](https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/subscribe-message/subscribeMessage.send.html) 。
+逻辑如下：
+
+1. 客户端调起[小程序订阅消息界面，返回用户订阅消息的操作结果]((https://developers.weixin.qq.com/miniprogram/dev/api/open-api/subscribe-message/wx.requestSubscribeMessage.html))。当用户勾选了订阅面板中的“总是保持以上选择，不再询问”时，模板消息会被添加到用户的小程序设置页。
+2. 服务端先获取全局 [access_token](https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/access-token/auth.getAccessToken.html) 。
+3. 服务端直接发送[订阅消息](https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/subscribe-message/subscribeMessage.send.html) 。
 
 ```go
 func TestMiniProgramClient_SendMessage(t *testing.T) {
