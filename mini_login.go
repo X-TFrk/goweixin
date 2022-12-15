@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"github.com/hunterhug/marmot/miner"
 	"strings"
+	"sync"
 )
 
 func init() {
@@ -16,8 +17,14 @@ func init() {
 }
 
 type MiniProgramClient struct {
-	AppId     string
-	AppSecret string
+	AppId             string
+	AppSecret         string
+	AccessToken       string
+	AccessTokenExpire int64
+	JsapiTicket       string
+	JsapiTicketExpire int64
+	accessTokenLock   sync.Mutex
+	jsapiTicketLock   sync.Mutex
 }
 
 func NewMiniProgramClient(appId, appSecret string) *MiniProgramClient {
