@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestMiniProgramClient_JsapiGetTicket(t *testing.T) {
+func TestGzClient_GetJsapiTicketAndSign(t *testing.T) {
 	miner.SetLogLevel(miner.INFO)
 
 	appId := "wxd4e08529844845e7"
@@ -18,7 +18,7 @@ func TestMiniProgramClient_JsapiGetTicket(t *testing.T) {
 
 	fmt.Println(appId, appSecret)
 
-	c := NewMiniProgramClient(appId, appSecret)
+	c := NewGzClient(appId, appSecret)
 
 	result, sign, err := c.GetJsapiTicketAndSign("http://mp.weixin.qq.com?params=value")
 	if err != nil {

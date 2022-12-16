@@ -21,10 +21,7 @@ type MiniProgramClient struct {
 	AppSecret         string
 	AccessToken       string
 	AccessTokenExpire int64
-	JsapiTicket       string
-	JsapiTicketExpire int64
 	accessTokenLock   sync.Mutex
-	jsapiTicketLock   sync.Mutex
 }
 
 func NewMiniProgramClient(appId, appSecret string) *MiniProgramClient {

@@ -140,16 +140,26 @@ func TestMiniProgramClient_GetPhoneNumber(t *testing.T) {
 }
 ```
 
-### D. [微信 JS-SDK 权限验证配置- jsapi_ticket 获取](https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/JS-SDK.html#3) 
+### D. [地理位置获取](https://developers.weixin.qq.com/miniprogram/dev/api/location/wx.getLocation.html)
+
+仅客户端操作。详见：[地理位置接口新增与相关流程调整](https://developers.weixin.qq.com/community/develop/doc/000a02f2c5026891650e7f40351c01) 。
+
+其他：[获取用户收货地址](https://developers.weixin.qq.com/miniprogram/dev/api/open-api/address/wx.chooseAddress.html) 。
+
+## 二. 公众号开发
+
+### D. [公众号：微信 JS-SDK 权限验证配置- jsapi_ticket 获取](https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/JS-SDK.html#3)
+
+PS：请勿使用小程序的 `app_id` 密钥对，而是应该用公众号的密钥对。
 
 完全在服务端操作，客户端只需传入 `url`，使用方式：
 
 ```go
-func TestMiniProgramClient_JsapiGetTicket(t *testing.T) {
+func TestGzClient_GetJsapiTicketAndSign(t *testing.T) {
 	appId := "wxd4e08529844845e7"
 	appSecret := "e6782244f7a7e994d20721f004e3e9ae"
 
-	c := NewMiniProgramClient(appId, appSecret)
+	c := NewGzClient(appId, appSecret)
 
 	result, sign, err := c.GetJsapiTicketAndSign("http://mp.weixin.qq.com?params=value")
 	if err != nil {
@@ -171,9 +181,3 @@ func TestMiniProgramClient_JsapiGetTicket(t *testing.T) {
     signature:"a03eb72c2a39ef4151f510d5895e8d4786d27c8f"
 }
 ```
-
-### E. [地理位置获取](https://developers.weixin.qq.com/miniprogram/dev/api/location/wx.getLocation.html)
-
-仅客户端操作。详见：[地理位置接口新增与相关流程调整](https://developers.weixin.qq.com/community/develop/doc/000a02f2c5026891650e7f40351c01) 。
-
-其他：[获取用户收货地址](https://developers.weixin.qq.com/miniprogram/dev/api/open-api/address/wx.chooseAddress.html) 。
