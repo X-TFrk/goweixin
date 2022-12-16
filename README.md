@@ -148,7 +148,7 @@ func TestMiniProgramClient_GetPhoneNumber(t *testing.T) {
 
 ## 二. 公众号开发
 
-### D. [公众号：微信 JS-SDK 权限验证配置- jsapi_ticket 获取](https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/JS-SDK.html#3)
+### A. [公众号：微信 JS-SDK 权限验证配置- jsapi_ticket 获取](https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/JS-SDK.html#3)
 
 PS：请勿使用小程序的 `app_id` 密钥对，而是应该用公众号的密钥对。
 
