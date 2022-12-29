@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/hunterhug/marmot/miner"
+	"strings"
 )
 
 type MiniProgramPhoneNumber struct {
@@ -41,6 +42,9 @@ func (c *MiniProgramClient) GetPhoneNumber(token string, code string) (*MiniProg
 	}
 
 	if wErr.ErrCode != 0 {
+		if strings.Contains(wErr.ErrMsg, "access_token expired") {
+			c.AccessToken = ""
+		}
 		return nil, wErr
 	}
 

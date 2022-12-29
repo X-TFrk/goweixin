@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/hunterhug/marmot/miner"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 )
@@ -75,6 +76,9 @@ func (c *GzClient) GetJsapiTicketAndSign(signUrl string) (ticket string, ticketS
 	}
 
 	if wErr.ErrCode != 0 {
+		if strings.Contains(wErr.ErrMsg, "access_token expired") {
+			c.AccessToken = ""
+		}
 		return "", nil, wErr
 	}
 
@@ -166,6 +170,6 @@ func (c *GzClient) AuthGetAccessToken() (token string, err error) {
 	}
 
 	c.AccessToken = t.AccessToken
-	c.AccessTokenExpire = time.Now().Unix() + 7100
+	c.AccessTokenExpire = time.Now().Unix() + 1800
 	return t.AccessToken, nil
 }

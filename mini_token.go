@@ -52,6 +52,6 @@ func (c *MiniProgramClient) AuthGetAccessToken() (token string, err error) {
 	}
 
 	c.AccessToken = t.AccessToken
-	c.AccessTokenExpire = time.Now().Unix() + 7100
+	c.AccessTokenExpire = time.Now().Unix() + 1800
 	return t.AccessToken, nil
 }
