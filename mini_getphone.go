@@ -21,7 +21,15 @@ type MiniProgramPhoneInfo struct {
 
 // GetPhoneNumber https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/phonenumber/phonenumber.getPhoneNumber.html
 func (c *MiniProgramClient) GetPhoneNumber(token string, code string) (*MiniProgramPhoneInfo, error) {
-	if token == "" || code == "" {
+	var err error
+	if token == "" {
+		token, err = c.AuthGetAccessToken()
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if code == "" {
 		return nil, errors.New("empty")
 	}
 
@@ -44,6 +52,7 @@ func (c *MiniProgramClient) GetPhoneNumber(token string, code string) (*MiniProg
 	if wErr.ErrCode != 0 {
 		if strings.Contains(wErr.ErrMsg, "access_token expired") {
 			c.AccessToken = ""
+			return c.GetPhoneNumber("", code)
 		}
 		return nil, wErr
 	}

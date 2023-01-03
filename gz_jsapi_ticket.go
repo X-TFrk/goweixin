@@ -93,7 +93,7 @@ func (c *GzClient) GetJsapiTicketAndSign(signUrl string) (ticket string, ticketS
 	}
 
 	c.JsapiTicket = t.Ticket
-	c.JsapiTicketExpire = time.Now().Unix() + 7100
+	c.JsapiTicketExpire = time.Now().Unix() + 3600
 
 	ticketSign, err = c.signJsapiTicket(t.Ticket, signUrl)
 	if err != nil {
