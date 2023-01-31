@@ -18,7 +18,7 @@ func TestMiniProgramClient_SendMessage(t *testing.T) {
 
 	fmt.Println(appId, appSecret)
 
-	c := NewMiniProgramClient(appId, appSecret)
+	c := NewMiniProgramClient(appId, appSecret, "")
 
 	token, err := c.AuthGetAccessToken()
 	if err != nil {
@@ -32,6 +32,12 @@ func TestMiniProgramClient_SendMessage(t *testing.T) {
 	templateId := "IgOxNz7ydQn9UiU09IgJtENIpIwigg5TroAbRLXcosY"
 	page := "index?foo=bar"
 	data := map[string]string{"thing1": "这是一个内容", "thing7": "这个也是内容", "thing3": "这个也是内容啊"}
+
+	err = c.SendMessage(token, openId, templateId, page, data)
+	if err != nil {
+		fmt.Println("send err:", err.Error())
+		return
+	}
 
 	err = c.SendMessage(token, openId, templateId, page, data)
 	if err != nil {

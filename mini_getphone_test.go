@@ -18,7 +18,7 @@ func TestMiniProgramClient_GetPhoneNumber(t *testing.T) {
 
 	fmt.Println(appId, appSecret)
 
-	c := NewMiniProgramClient(appId, appSecret)
+	c := NewMiniProgramClient(appId, appSecret, "")
 
 	token, err := c.AuthGetAccessToken()
 	if err != nil {
@@ -27,13 +27,15 @@ func TestMiniProgramClient_GetPhoneNumber(t *testing.T) {
 	}
 
 	fmt.Println("token is:", token)
+	fmt.Printf("%#v\n", c)
 
-	code := "910031e46a34e633401c2ebb23f281646ea9775ad8c1276b793e59846f0ddb22"
+	code := "becf1c15ea4e7d28d31aa77350670c04058f45883bc8bd16200bac64bb7b6312"
 	phone, err := c.GetPhoneNumber(token, code)
 	if err != nil {
 		fmt.Println(err.Error())
 		return
 	}
 
-	fmt.Printf("%#v", phone)
+	fmt.Printf("%#v\n", phone)
+
 }

@@ -5,16 +5,17 @@ import (
 	"errors"
 	"fmt"
 	"github.com/hunterhug/marmot/miner"
+	"strings"
 )
 
-//var (
-// MiniProgramStateDeveloper 开发版
-// MiniProgramStateDeveloper = "developer"
-// MiniProgramStateTrial 体验版
-// MiniProgramStateTrial = "trial"
-// MiniProgramStateFormal 正式版
-// MiniProgramStateFormal = "formal"
-//)
+var (
+	// MiniProgramStateDeveloper 开发版
+	MiniProgramStateDeveloper = "developer"
+	// MiniProgramStateTrial 体验版
+	MiniProgramStateTrial = "trial"
+	// MiniProgramStateFormal 正式版
+	MiniProgramStateFormal = "formal"
+)
 
 type MiniProgramMessage struct {
 	// 接收者（用户）的 openid
@@ -40,6 +41,14 @@ func (e *ErrorRsp) Error() string {
 
 // SendMessage https://developers.weixin.qq.com/miniprogram/dev/api/open-api/subscribe-message/wx.requestSubscribeMessage.html
 func (c *MiniProgramClient) SendMessage(token string, openId string, templateId, page string, data map[string]string) error {
+	var err error
+	if token == "" {
+		token, err = c.AuthGetAccessToken()
+		if err != nil {
+			return err
+		}
+	}
+
 	if token == "" || openId == "" || templateId == "" {
 		return errors.New("empty")
 	}
@@ -58,7 +67,7 @@ func (c *MiniProgramClient) SendMessage(token string, openId string, templateId,
 	}
 
 	m.Data = mm
-	//m.MiniProgramState = state
+	m.MiniProgramState = c.MiniProgramState
 
 	raw, err := json.Marshal(m)
 	if err != nil {
@@ -68,13 +77,14 @@ func (c *MiniProgramClient) SendMessage(token string, openId string, templateId,
 	worker := miner.NewAPI().Clone()
 	body, err := worker.SetUrl(url).SetBData(raw).PostJSON()
 	if err != nil {
+		miner.Logger.Infof("MiniProgramClient SendMessage err: %s", err.Error())
 		return err
 	}
 
 	miner.Logger.Infof("MiniProgramClient SendMessage raw: %s", string(body))
 
 	if worker.ResponseStatusCode != 200 {
-		return errors.New(fmt.Sprintf("MiniProgramClient SendMessage http status:%d", worker.ResponseStatusCode))
+		return errors.New(fmt.Sprintf("MiniProgramClient SendMessage http status: %d", worker.ResponseStatusCode))
 	}
 
 	wErr := new(ErrorRsp)
@@ -84,6 +94,11 @@ func (c *MiniProgramClient) SendMessage(token string, openId string, templateId,
 	}
 
 	if wErr.ErrCode != 0 {
+		if strings.Contains(wErr.ErrMsg, "access_token expired") {
+			miner.Logger.Infof("MiniProgramClient SendMessage access_token expired try again")
+			c.AccessToken = ""
+			return c.SendMessage("", openId, templateId, page, data)
+		}
 		return wErr
 	}
 

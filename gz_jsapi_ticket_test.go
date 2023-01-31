@@ -26,5 +26,6 @@ func TestGzClient_GetJsapiTicketAndSign(t *testing.T) {
 		return
 	}
 
-	fmt.Printf("%#v, %#v", result, sign)
+	fmt.Printf("%#v\n%#v\n", result, sign)
+	fmt.Printf("%#v", c)
 }

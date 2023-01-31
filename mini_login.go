@@ -22,12 +22,17 @@ type MiniProgramClient struct {
 	AccessToken       string
 	AccessTokenExpire int64
 	accessTokenLock   sync.Mutex
+	MiniProgramState  string
 }
 
-func NewMiniProgramClient(appId, appSecret string) *MiniProgramClient {
+func NewMiniProgramClient(appId, appSecret string, programState string) *MiniProgramClient {
 	m := new(MiniProgramClient)
 	m.AppId = appId
 	m.AppSecret = appSecret
+	m.MiniProgramState = programState
+	if programState == "" {
+		m.MiniProgramState = MiniProgramStateFormal
+	}
 	return m
 }
 

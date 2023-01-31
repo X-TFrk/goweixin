@@ -10,6 +10,7 @@ import (
 
 type MiniProgramAccessToken struct {
 	AccessToken string `json:"access_token"`
+	ExpiresIn   int64  `json:"expires_in"`
 }
 
 // AuthGetAccessToken https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/access-token/auth.getAccessToken.html
@@ -52,6 +53,6 @@ func (c *MiniProgramClient) AuthGetAccessToken() (token string, err error) {
 	}
 
 	c.AccessToken = t.AccessToken
-	c.AccessTokenExpire = time.Now().Unix() + 1800
+	c.AccessTokenExpire = time.Now().Unix() + t.ExpiresIn - 5
 	return t.AccessToken, nil
 }

@@ -31,7 +31,8 @@ func NewGzClient(appId, appSecret string) *GzClient {
 }
 
 type JsapiTicket struct {
-	Ticket string `json:"ticket"`
+	Ticket    string `json:"ticket"`
+	ExpiresIn int64  `json:"expires_in"`
 }
 
 type JsapiTicketSign struct {
@@ -55,31 +56,51 @@ func (c *GzClient) GetJsapiTicketAndSign(signUrl string) (ticket string, ticketS
 		return c.JsapiTicket, ticketSign, nil
 	}
 
-	token, err := c.AuthGetAccessToken()
-	if err != nil {
-		return "", nil, err
-	}
-
-	url := fmt.Sprintf("https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=%s&type=jsapi", token)
-	api := miner.NewAPI()
-	raw, err := api.Clone().SetUrl(url).Get()
-	if err != nil {
-		return "", nil, err
-	}
-
-	miner.Logger.Infof("GzClient GetJsapiTicketAndSign: %v", string(raw))
-
-	wErr := new(ErrorRsp)
-	err = json.Unmarshal(raw, wErr)
-	if err != nil {
-		return "", nil, err
-	}
-
-	if wErr.ErrCode != 0 {
-		if strings.Contains(wErr.ErrMsg, "access_token expired") {
-			c.AccessToken = ""
+	var raw []byte
+	errTry := 0
+	times := 3
+	for {
+		token, err := c.AuthGetAccessToken()
+		if err != nil {
+			return "", nil, err
 		}
-		return "", nil, wErr
+
+		url := fmt.Sprintf("https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=%s&type=jsapi", token)
+		api := miner.NewAPI()
+		raw, err = api.Clone().SetUrl(url).Get()
+		if err != nil {
+			miner.Logger.Infof("GzClient GetJsapiTicketAndSign try %d-err: %v", errTry, err.Error())
+			errTry = errTry + 1
+			if errTry <= times {
+				continue
+			}
+			return "", nil, err
+		}
+
+		miner.Logger.Infof("GzClient GetJsapiTicketAndSign try %d: %v", errTry, string(raw))
+
+		wErr := new(ErrorRsp)
+		err = json.Unmarshal(raw, wErr)
+		if err != nil {
+			return "", nil, err
+		}
+
+		if wErr.ErrCode != 0 {
+			if strings.Contains(wErr.ErrMsg, "access_token expired") {
+				miner.Logger.Infof("GzClient GetJsapiTicketAndSign access_token expired try again: %d", errTry)
+				errTry = errTry + 1
+				if errTry <= times {
+					c.AccessToken = ""
+					continue
+				}
+
+				return "", nil, wErr
+			} else {
+				return "", nil, wErr
+			}
+		}
+
+		break
 	}
 
 	t := new(JsapiTicket)
@@ -93,7 +114,9 @@ func (c *GzClient) GetJsapiTicketAndSign(signUrl string) (ticket string, ticketS
 	}
 
 	c.JsapiTicket = t.Ticket
-	c.JsapiTicketExpire = time.Now().Unix() + 3600
+
+	// 有效期两个小时
+	c.JsapiTicketExpire = time.Now().Unix() + t.ExpiresIn - 5
 
 	ticketSign, err = c.signJsapiTicket(t.Ticket, signUrl)
 	if err != nil {
@@ -128,6 +151,7 @@ func (c *GzClient) signJsapiTicket(ticket, signUrl string) (*JsapiTicketSign, er
 
 type GzAccessToken struct {
 	AccessToken string `json:"access_token"`
+	ExpiresIn   int64  `json:"expires_in"`
 }
 
 // AuthGetAccessToken https://developers.weixin.qq.com/miniprogram/dev/api-backend/open-api/access-token/auth.getAccessToken.html
@@ -170,6 +194,8 @@ func (c *GzClient) AuthGetAccessToken() (token string, err error) {
 	}
 
 	c.AccessToken = t.AccessToken
-	c.AccessTokenExpire = time.Now().Unix() + 1800
+
+	// 有效期两个小时
+	c.AccessTokenExpire = time.Now().Unix() + t.ExpiresIn - 5
 	return t.AccessToken, nil
 }

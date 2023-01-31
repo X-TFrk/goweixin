@@ -29,7 +29,7 @@ func (c *MiniProgramClient) GetPhoneNumber(token string, code string) (*MiniProg
 		}
 	}
 
-	if code == "" {
+	if token == "" || code == "" {
 		return nil, errors.New("empty")
 	}
 
@@ -38,10 +38,15 @@ func (c *MiniProgramClient) GetPhoneNumber(token string, code string) (*MiniProg
 	worker := miner.NewAPI().Clone()
 	body, err := worker.SetUrl(url).SetBData([]byte(fmt.Sprintf(`{ "code": "%s" }`, code))).PostJSON()
 	if err != nil {
+		miner.Logger.Infof("MiniProgramClient GetPhoneNumber err: %s", err.Error())
 		return nil, err
 	}
 
 	miner.Logger.Infof("MiniProgramClient GetPhoneNumber raw: %s", string(body))
+
+	if worker.ResponseStatusCode != 200 {
+		return nil, errors.New(fmt.Sprintf("MiniProgramClient GetPhoneNumber http status: %d", worker.ResponseStatusCode))
+	}
 
 	wErr := new(ErrorRsp)
 	err = json.Unmarshal(body, wErr)
@@ -51,6 +56,7 @@ func (c *MiniProgramClient) GetPhoneNumber(token string, code string) (*MiniProg
 
 	if wErr.ErrCode != 0 {
 		if strings.Contains(wErr.ErrMsg, "access_token expired") {
+			miner.Logger.Infof("MiniProgramClient GetPhoneNumber access_token expired try again")
 			c.AccessToken = ""
 			return c.GetPhoneNumber("", code)
 		}
