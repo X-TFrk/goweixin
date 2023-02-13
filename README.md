@@ -150,7 +150,7 @@ func TestMiniProgramClient_GetPhoneNumber(t *testing.T) {
 
 ### A. [公众号：微信 JS-SDK 权限验证配置- jsapi_ticket 获取](https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/JS-SDK.html#3)
 
-PS：请勿使用小程序的 `app_id` 密钥对，而是应该用公众号的密钥对。
+PS：请勿使用小程序的 `app_id` 密钥对，而是应该用公众号的密钥对。运用在微信内打开 `h5` 页面。
 
 完全在服务端操作，客户端只需传入 `url`，使用方式：
 
@@ -181,3 +181,8 @@ func TestGzClient_GetJsapiTicketAndSign(t *testing.T) {
     signature:"a03eb72c2a39ef4151f510d5895e8d4786d27c8f"
 }
 ```
+
+## 网站应用开发
+
+### A. [微信扫二维码登陆网站](https://developers.weixin.qq.com/doc/oplatform/Website_App/WeChat_Login/Wechat_Login.html)
+
