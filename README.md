@@ -182,7 +182,63 @@ func TestGzClient_GetJsapiTicketAndSign(t *testing.T) {
 }
 ```
 
-## 网站应用开发
+## 三. 网站应用开发
 
-### A. [微信扫二维码登陆网站](https://developers.weixin.qq.com/doc/oplatform/Website_App/WeChat_Login/Wechat_Login.html)
+### A. 微信第三方登录
+
+适用于网页端，移动端APP的微信登录。具体参考[官方文档](https://developers.weixin.qq.com/doc/oplatform/Website_App/WeChat_Login/Wechat_Login.html) 。
+
+需要客户端和服务端联调。
+
+逻辑如下：
+
+1.客户端先调用以下接口（网站内嵌二维码微信登录JS实现请见官方文档）:
+
+https://open.weixin.qq.com/connect/qrconnect?appid=wxbdc5610cc59c1631&redirect_uri=http://127.0.0.1:9999&response_type=code&scope=snsapi_login,snsapi_userinfo&state=test#wechat_redirect
+
+| 参数 | 是否必须 | 说明 |
+|----|------|----|
+| appid | 是    | 应用唯一标识 |
+| redirect_uri | 	是   | 	请使用 urlEncode 对链接进行处理 |
+| response_type | 	是   | 	填code |
+| scope | 	是	  | 应用授权作用域，拥有多个作用域用逗号（,）分隔，网页应用目前仅填写snsapi_login |
+| state | 否	   | 用于保持请求和回调的状态，授权请求后原样带回给第三方。该参数可用于防止 csrf 攻击（跨站请求伪造攻击），建议第三方带上该参数，可设置为简单的随机数加 session 进行校验 |
+
+微信用户允许授权第三方应用后，微信将会携带 `CODE` 并且回调到 `redirect_uri`，类似： `http://127.0.0.1:9999?code=CODE&state=STATE`，其中 `STATE` 一般为我们自己网站内部的用户标志。
+
+当提示 `redirect_uri 参数错误` 请去开放平台配置授权回调域。
+
+2.将第一步得到的 `CODE` 提交给服务端，服务端调用以下链接:
+
+https://api.weixin.qq.com/sns/oauth2/access_token?appid=wxbdc5610cc59c1631&secret=00cc512fc031fcdsfsdfba01c8a41f05b4b5&code=CODE&grant_type=authorization_code
+
+将获取到 `access_token`，`unionid`，`openid`，继续调用以下链接获取用户信息：
+
+https://api.weixin.qq.com/sns/userinfo?access_token=accessToken&openid=openid&lang=zh_CN
+
+你只需使用该 `SDK` 实现登录即可：
+
+```go
+func TestOpenClient_LoginGetUserInfo(t *testing.T) {
+	miner.SetLogLevel(miner.INFO)
+
+	appId := "wxbdc5610cc59c1631"
+	appSecret := "e6782244f7a7e994d20721f004e3e9ae"
+
+	fmt.Println(appId, appSecret)
+
+	c := NewOpenClient(appId, appSecret)
+
+	code := "033SD2100a5hZO15kd100qqPJf2SD21f"
+	result, err := c.LoginGetUserInfo(code)
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+
+	fmt.Printf("%s,%s", result.OpenId, result.UnionId)
+}
+```
+
+
 
