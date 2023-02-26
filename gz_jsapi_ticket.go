@@ -115,7 +115,7 @@ func (c *GzClient) GetJsapiTicketAndSign(signUrl string) (ticket string, ticketS
 
 	c.JsapiTicket = t.Ticket
 
-	// 有效期两个小时
+	// 有效期
 	c.JsapiTicketExpire = time.Now().Unix() + t.ExpiresIn - 5
 
 	ticketSign, err = c.signJsapiTicket(t.Ticket, signUrl)
@@ -164,38 +164,54 @@ func (c *GzClient) AuthGetAccessToken() (token string, err error) {
 		return c.AccessToken, nil
 	}
 
-	url := fmt.Sprintf("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s", c.AppId, c.AppSecret)
-	api := miner.NewAPI()
-	raw, err := api.Clone().SetUrl(url).Get()
-	if err != nil {
-		return "", err
-	}
-
-	miner.Logger.Infof("GzClient AuthGetAccessToken token: %v", string(raw))
-
-	wErr := new(ErrorRsp)
-	err = json.Unmarshal(raw, wErr)
-	if err != nil {
-		return "", err
-	}
-
-	if wErr.ErrCode != 0 {
-		return "", wErr
-	}
+	// 令牌过期时必须同步清空其他关联
+	c.JsapiTicket = ""
 
 	t := new(GzAccessToken)
-	err = json.Unmarshal(raw, t)
-	if err != nil {
-		return "", err
-	}
 
-	if t.AccessToken == "" {
-		return "", errors.New("token empty")
+	var raw []byte
+	errTry := 0
+	times := 3
+	for {
+		url := fmt.Sprintf("https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s", c.AppId, c.AppSecret)
+		api := miner.NewAPI()
+		raw, err = api.Clone().SetUrl(url).Get()
+		if err != nil {
+			miner.Logger.Infof("GzClient AuthGetAccessToken try %d-err: %v", errTry, err.Error())
+			errTry = errTry + 1
+			if errTry <= times {
+				continue
+			}
+			return "", err
+		}
+
+		miner.Logger.Infof("GzClient AuthGetAccessToken  try %d, token: %v", errTry, string(raw))
+
+		wErr := new(ErrorRsp)
+		err = json.Unmarshal(raw, wErr)
+		if err != nil {
+			return "", err
+		}
+
+		if wErr.ErrCode != 0 {
+			return "", wErr
+		}
+
+		err = json.Unmarshal(raw, t)
+		if err != nil {
+			return "", err
+		}
+
+		if t.AccessToken == "" {
+			return "", errors.New("token empty")
+		}
+
+		break
 	}
 
 	c.AccessToken = t.AccessToken
 
-	// 有效期两个小时
+	// 有效期
 	c.AccessTokenExpire = time.Now().Unix() + t.ExpiresIn - 5
 	return t.AccessToken, nil
 }
