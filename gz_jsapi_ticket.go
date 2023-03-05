@@ -42,18 +42,23 @@ type JsapiTicketSign struct {
 	Signature string `json:"signature"`
 }
 
+// SkipCacheTicket 微信分享有点小问题，先不要缓存！
+var SkipCacheTicket = true
+
 // GetJsapiTicketAndSign JSSDK使用步骤: https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/JS-SDK.html#3
 // 签名说明：https://developers.weixin.qq.com/doc/offiaccount/OA_Web_Apps/JS-SDK.html#62
 func (c *GzClient) GetJsapiTicketAndSign(signUrl string) (ticket string, ticketSign *JsapiTicketSign, err error) {
 	c.jsapiTicketLock.Lock()
 	defer c.jsapiTicketLock.Unlock()
 
-	if c.JsapiTicket != "" && c.JsapiTicketExpire <= time.Now().Unix() {
-		ticketSign, err = c.signJsapiTicket(c.JsapiTicket, signUrl)
-		if err != nil {
-			return "", nil, err
+	if !SkipCacheTicket {
+		if c.JsapiTicket != "" && c.JsapiTicketExpire <= time.Now().Unix() {
+			ticketSign, err = c.signJsapiTicket(c.JsapiTicket, signUrl)
+			if err != nil {
+				return "", nil, err
+			}
+			return c.JsapiTicket, ticketSign, nil
 		}
-		return c.JsapiTicket, ticketSign, nil
 	}
 
 	var raw []byte
@@ -116,7 +121,7 @@ func (c *GzClient) GetJsapiTicketAndSign(signUrl string) (ticket string, ticketS
 	c.JsapiTicket = t.Ticket
 
 	// 有效期
-	c.JsapiTicketExpire = time.Now().Unix() + t.ExpiresIn - 5
+	c.JsapiTicketExpire = time.Now().Unix() + t.ExpiresIn - 120
 
 	ticketSign, err = c.signJsapiTicket(t.Ticket, signUrl)
 	if err != nil {
@@ -212,6 +217,6 @@ func (c *GzClient) AuthGetAccessToken() (token string, err error) {
 	c.AccessToken = t.AccessToken
 
 	// 有效期
-	c.AccessTokenExpire = time.Now().Unix() + t.ExpiresIn - 5
+	c.AccessTokenExpire = time.Now().Unix() + t.ExpiresIn - 120
 	return t.AccessToken, nil
 }
