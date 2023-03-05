@@ -51,14 +51,15 @@ func (c *GzClient) GetJsapiTicketAndSign(signUrl string) (ticket string, ticketS
 	c.jsapiTicketLock.Lock()
 	defer c.jsapiTicketLock.Unlock()
 
+	now := time.Now().Unix()
 	if !SkipCacheTicket {
-		if c.JsapiTicket != "" && c.JsapiTicketExpire <= time.Now().Unix() {
+		if c.JsapiTicket != "" && c.JsapiTicketExpire <= now && c.AccessToken != "" && c.AccessTokenExpire <= now {
 			ticketSign, err = c.signJsapiTicket(c.JsapiTicket, signUrl)
 			if err != nil {
 				return "", nil, err
 			}
-			return c.JsapiTicket, ticketSign, nil
 		}
+		return c.JsapiTicket, ticketSign, nil
 	}
 
 	var raw []byte
@@ -92,10 +93,12 @@ func (c *GzClient) GetJsapiTicketAndSign(signUrl string) (ticket string, ticketS
 
 		if wErr.ErrCode != 0 {
 			if strings.Contains(wErr.ErrMsg, "access_token expired") {
+				c.AccessToken = ""
+				c.JsapiTicket = ""
+
 				miner.Logger.Infof("GzClient GetJsapiTicketAndSign access_token expired try again: %d", errTry)
 				errTry = errTry + 1
 				if errTry <= times {
-					c.AccessToken = ""
 					continue
 				}
 
@@ -170,6 +173,7 @@ func (c *GzClient) AuthGetAccessToken() (token string, err error) {
 	}
 
 	// 令牌过期时必须同步清空其他关联
+	c.AccessToken = ""
 	c.JsapiTicket = ""
 
 	t := new(GzAccessToken)
